@@ -81,7 +81,8 @@ docker exec -it intranet-web-1 python manage.py createsuperuser
 ## Updating
 
 After the workflow has published a new image, open the stack in Portainer and update it with
-**re-pull image** enabled.
+**re-pull image** enabled. The page header and footer then show the new version, the build
+date and commit (e.g. `2026.10.08-f5462d7`), which matches the commit on GitHub.
 
 To make this automatic, enable the stack webhook in Portainer (with re-pull image enabled), if
 your Portainer edition offers it, and save its URL as the repository secret

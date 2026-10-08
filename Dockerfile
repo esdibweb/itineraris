@@ -20,6 +20,10 @@ RUN SECRET_KEY=build-only DJANGO_ALLOWED_HOSTS=localhost python manage.py collec
     && chown app:app /app/media \
     && chmod +x /app/entrypoint.sh
 
+# Shown in the app's header and footer; set by the GitHub workflow
+ARG APP_VERSION=dev
+ENV APP_VERSION=$APP_VERSION
+
 USER app
 EXPOSE 8000
 

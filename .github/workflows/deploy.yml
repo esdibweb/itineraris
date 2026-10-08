@@ -43,10 +43,14 @@ jobs:
           tags: |
             type=raw,value=latest
             type=sha
+      # Build date and short commit, e.g. 2026.10.08-f5462d7; shown in the app's header and footer
+      - id: version
+        run: echo "version=$(date -u +%Y.%m.%d)-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@v6
         with:
           context: .
           push: true
+          build-args: APP_VERSION=${{ steps.version.outputs.version }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha

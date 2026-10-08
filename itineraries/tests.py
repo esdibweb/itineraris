@@ -3,7 +3,7 @@ from io import StringIO
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from gcodex.models import Student
@@ -106,3 +106,9 @@ class PageSmokeTests(TestCase):
         response = self.client.post(reverse('itineraries:delete_premis', args=[self.activities['premis'].id]))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Annotation.objects.get(student=self.student).total_hours, 6)
+
+    @override_settings(APP_VERSION='2026.10.08-abc1234')
+    def test_version_is_shown(self):
+        self.assertContains(self.client.get(reverse('home')), 'v2026.10.08-abc1234')
+        self.client.logout()
+        self.assertContains(self.client.get(reverse('login')), 'Versió 2026.10.08-abc1234')

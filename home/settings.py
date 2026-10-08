@@ -13,6 +13,9 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Build date and commit, set by the GitHub workflow when it builds the image
+APP_VERSION = os.environ.get("APP_VERSION", "dev")
+
 
 # Security
 
@@ -87,6 +90,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "home.context_processors.app_version",
             ],
         },
     },
