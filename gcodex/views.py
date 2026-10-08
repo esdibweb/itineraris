@@ -161,6 +161,16 @@ def apply_changes(obj, values):
     return changed
 
 
+def fit_row(row, column_count):
+    """
+    Return the row cut to column_count cells, or None if it does not match the header.
+    Trailing empty cells beyond the header are allowed (exports often end lines with a comma).
+    """
+    if not row or len(row) < column_count or any(cell.strip() for cell in row[column_count:]):
+        return None
+    return row[:column_count]
+
+
 def line_list(row_numbers, limit=20):
     """'3, 7, 9' or '3, 7, 9 i 12 més' for messages."""
     shown = ', '.join(str(number) for number in row_numbers[:limit])
@@ -193,6 +203,9 @@ class BaseCSVImportView(PermissionRequiredMixin, FormView):
         if headers is None:
             messages.error(self.request, 'El fitxer CSV està buit.')
             return self.form_invalid(form)
+        # Codex exports may end the header line with a comma, i.e. an empty column name
+        while headers and not headers[-1].strip():
+            headers.pop()
 
         missing_fields = [field for field in self.required_fields if field not in headers]
         if missing_fields:
@@ -202,8 +215,8 @@ class BaseCSVImportView(PermissionRequiredMixin, FormView):
         header_indices = {header: index for index, header in enumerate(headers)}
 
         # The school year is taken from the first data row
-        first_row = next(reader, None)
-        if not first_row or len(first_row) != len(headers):
+        first_row = fit_row(next(reader, None), len(headers))
+        if not first_row:
             messages.error(self.request, "No s'ha pogut detectar el curs escolar.")
             return self.form_invalid(form)
         course_year_name = first_row[header_indices['Curs escolar']]
@@ -211,7 +224,8 @@ class BaseCSVImportView(PermissionRequiredMixin, FormView):
         # Line 1 is the header, so data rows start at line 2
         rows, inconsistent = [], []
         for row_number, row in chain([(2, first_row)], enumerate(reader, start=3)):
-            if len(row) != len(headers):
+            row = fit_row(row, len(headers))
+            if row is None:
                 inconsistent.append(row_number)
                 continue
             rows.append((row_number, {field: row[header_indices[field]] for field in self.required_fields}))

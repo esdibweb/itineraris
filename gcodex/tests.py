@@ -171,3 +171,24 @@ class UploadTeachersTests(ImportTestCase):
         teacher.refresh_from_db()
         self.assertEqual(teacher.name, 'Nom')
         self.assertEqual(list(teacher.course_years.values_list('year', flat=True)), [YEAR])
+
+    def test_header_ending_with_a_comma_is_accepted(self):
+        # Codex exports the teachers' header with a trailing comma: one more column than the rows
+        row = ','.join(csv_row(REQUIRED_FIELDS_TEACHERS))
+        content = ','.join(REQUIRED_FIELDS_TEACHERS) + ',\n' + row + '\n' + row + ',\n'
+        upload = SimpleUploadedFile('docents.csv', content.encode('utf-8'), content_type='text/csv')
+
+        response = self.client.post(self.url, {'csv_file': upload}, follow=True)
+
+        self.assertContains(response, 'importades correctament')
+        self.assertEqual(Teacher.objects.get().course_years.get().year, YEAR)
+
+    def test_short_rows_are_reported(self):
+        row = csv_row(REQUIRED_FIELDS_TEACHERS)
+        rows = [row, row[:-5]]
+        response = self.client.post(
+            self.url, {'csv_file': csv_upload(rows, fields=REQUIRED_FIELDS_TEACHERS)}, follow=True,
+        )
+
+        self.assertContains(response, 'Línies inconsistents, no importades: 3')
+        self.assertEqual(Teacher.objects.count(), 1)
