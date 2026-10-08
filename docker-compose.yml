@@ -1,0 +1,73 @@
+# Production stack (e.g. a Portainer stack). Variables are documented in .env.example.
+# HTTPS is handled by the reverse proxy in front, which forwards to APP_PORT.
+
+services:
+  web:
+    image: "${APP_IMAGE:?Set APP_IMAGE, e.g. ghcr.io/owner/repo:latest}"
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:?Set DJANGO_ALLOWED_HOSTS}
+      SQL_ENGINE: django.db.backends.postgresql
+      SQL_DATABASE: ${POSTGRES_DB:-intranet}
+      SQL_USER: ${POSTGRES_USER:-intranet}
+      SQL_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      SQL_HOST: db
+      SQL_PORT: "5432"
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-no-reply@escoladisseny.com}
+      ALLOWED_SIGNUP_DOMAINS: ${ALLOWED_SIGNUP_DOMAINS:-escoladisseny.com alum.escoladisseny.com}
+      SECURE_HSTS_SECONDS: ${SECURE_HSTS_SECONDS:-2592000}
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    volumes:
+      - media:/app/media
+
+  db:
+    image: "postgres:${POSTGRES_VERSION:-17}"
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-intranet}
+      POSTGRES_USER: ${POSTGRES_USER:-intranet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Daily database dump to the "backups" volume, keeping BACKUP_KEEP_DAYS days
+  backup:
+    image: "postgres:${POSTGRES_VERSION:-17}"
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGDATABASE: ${POSTGRES_DB:-intranet}
+      PGUSER: ${POSTGRES_USER:-intranet}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    volumes:
+      - backups:/backups
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        while true; do
+          pg_dump --format=custom --file="/backups/intranet-$$(date +%F).dump" \
+            && find /backups -name '*.dump' -mtime +"$$BACKUP_KEEP_DAYS" -delete
+          sleep 86400
+        done
+
+volumes:
+  media:
+  pgdata:
+  backups:

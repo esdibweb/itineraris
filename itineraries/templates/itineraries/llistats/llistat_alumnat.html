@@ -1,0 +1,83 @@
+{% extends 'itineraries/llistat.html' %}
+
+{% block title %}Llistat alumnat{% endblock %}
+
+{% block title_content %}Llistat alumnat{% endblock %}
+
+{% block content %}
+    <table id="alumnat" class="table table-striped">
+        <thead>
+            <tr>
+                <th>DNI</th>
+                <th>Nom</th>
+                <th>Adreça</th>
+                <th>Hores</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+
+    $(document).ready(function() {
+
+        idTable = 'alumnat';
+        ajaxUrl = "{% url 'itineraries:students_hours_data' %}";
+
+        // Define las URL editUrl y deleteUrl como plantillas aquí
+        const editUrlTemplate = "{% url 'itineraries:alumnat_hores' pk=0 %}";
+
+        // Variable para definir el ancho de los botones
+        const buttonWidth = "80px";  // Puedes cambiar el valor a porcentaje o píxeles según tu preferencia
+
+        $('#' + idTable).DataTable({
+            "ajax": ajaxUrl,
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ entrades per pàgina",
+                "zeroRecords": "No s'han trobat resultats",
+                "info": "Mostrant de _START_ a _END_ de _TOTAL_ entrades",
+                "infoEmpty": "Mostrant de 0 a 0 de 0 entrades",
+                "infoFiltered": "(filtrat de _MAX_ entrades en total)",
+                "search": "Cercar:",
+                "paginate": {
+                    "first": "Primer",
+                    "last": "Últim",
+                    "next": "Següent",
+                    "previous": "Anterior"
+                }
+            },
+            "stateSave": true,
+            "autoWidth": false, // Evita que les columnes es redimensionin automàticament
+            "columns": [
+                { "data": "id_number", "title": "DNI", "render": DataTable.render.text() },
+                { "data": "complete_name", "title": "Nom", "render": DataTable.render.text() },
+                { "data": "school_email", "title": "Adreça electrònica", "render": DataTable.render.text() },
+                { "data": "total_hours", "title": "Hores" },
+                {
+                    "data": null,
+                    "title": 'Opcions',
+                    "orderable": false,
+                    "className": "text-center",  // Centra el contingut de la columna
+                    "render": function (data, type, row) {
+
+                        const viewUrl = editUrlTemplate.replace('0', row.id);
+
+                        return '<div class="d-flex justify-content-end gap-2">' +
+                            '<a href="' + viewUrl + '" class="btn btn-sm btn-secondary" style="width:' + buttonWidth + '">Veure</a>' +
+                            '</div>';
+                    }
+                }
+            ],
+            "columnDefs": [
+                { "width": "1%", "targets": -1 }
+            ]
+        });
+    });
+
+</script>
+
+{% endblock %}

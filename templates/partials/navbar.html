@@ -1,0 +1,73 @@
+{% load static %}
+
+{% load custom_filters %}
+<header>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+
+    <div class="container-fluid">
+      <!-- Logo -->
+      <a class="navbar-brand" href="{% url 'home' %}">
+        <img src="{% static 'images/logotip-esdib.png' %}" alt="Logotip" width="50" height="50" class="d-inline-block align-text-top">
+      </a>
+
+      <!-- Toggle -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M2.5 12.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm0-5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11z"/>
+          </svg>
+        </span>
+
+      </button>
+
+      <!-- Collapsible content -->
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <!-- App selector -->
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <select class="form-select" onchange="location = this.value;">
+              <option value="/" {% if request.path not in request.resolver_match.view_name %}selected{% endif %}>Apps</option>
+
+              {% if perms.itineraries %}
+                <option value="{% url 'itineraries:index' %}" {% if request.resolver_match.view_name|startswith:'itineraries:' %}selected{% endif %}>
+                  Itineraris alumnat
+                </option>
+              {% endif %}
+
+              {% if perms.gcodex %}
+                <option value="{% url 'gcodex:alumnat' %}" {% if request.resolver_match.view_name|startswith:'gcodex:' %}selected{% endif %}>
+                  Importació Codex
+                </option>
+              {% endif %}
+
+            </select>
+          </li>
+        </ul>
+
+        <!-- Avatar -->
+        {% if user.is_authenticated %}
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="avatarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <!-- Avatar -->
+              <img src="{% if user.avatar and user.avatar.name %}{% url 'avatar_view' username=user.username %}{% else %}{% static 'images/logotip-esdib.png' %}{% endif %}"
+                   alt="Avatar" width="30" height="30" class="rounded-circle">
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="avatarDropdown">
+              <!-- Logout -->
+              <li>
+                <form method="post" action="{% url 'logout' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item">Sortir</button>
+                </form>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+</header>

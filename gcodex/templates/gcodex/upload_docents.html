@@ -1,0 +1,20 @@
+{% extends 'gcodex/index.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title_content %}Importació Docents Dades Codex{% endblock %}
+
+{% block content %}
+    <form method="post" enctype="multipart/form-data">
+        Instruccions: <br>
+        <ul>
+            <li>Curs Escolar -> Processos admissió</li>
+            <li>Exportar professors a: csv </li>
+            <li>Descarregar arxiu i pujar-lo</li>
+        </ul>
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary btn-md mt-3">Enviar</button>
+    </form>
+
+{% endblock %}

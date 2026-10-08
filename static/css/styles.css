@@ -1,0 +1,44 @@
+/* css */
+.navbar{
+  background-color: rgb(205, 200, 193);
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  color:black;
+  margin-bottom: 1rem;
+}
+
+.navbar a, .navbar a:hover{
+  color:black;
+}
+
+#sidebar .list-group a.active{
+  background-color: #887262;
+  border-color:black;
+}
+
+/*_
+.main-content {
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+  }
+*/
+
+.pagination .page-item.active .page-link {
+  background-color: #6c757d;
+  border-color: #6c757d;
+
+}
+
+.pagination .page-item:hover .page-link {
+  background-color: #5c636a;
+  border-color: #5c636a;
+  color: white;
+}
+
+/* Selector students */
+.select2.select2-container.select2-container--default {
+  max-width: 300px;
+}

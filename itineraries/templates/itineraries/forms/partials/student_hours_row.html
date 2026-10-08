@@ -1,0 +1,29 @@
+{% load crispy_forms_tags %}
+                        <tr>
+                            <td>
+                                {% if form.instance.student %}
+                                    {{ form.instance.student.complete_name }}
+                                    {{ form.student|as_crispy_field }}
+                                {% else %}
+                                    {{ form.student|as_crispy_field }}
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if form.instance.hours %}
+                                    {{ form.instance.hours }}
+                                    {{ form.hours|as_crispy_field }}
+                                {% else %}
+                                    {{ form.hours|as_crispy_field }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% comment %}Email notification is disabled.
+                                {% if form.instance.student and form.instance.student.school_email %}
+                                    {{ form.notify|as_crispy_field }}
+                                {% endif %}
+                                {% endcomment %}
+                                {{ form.DELETE|as_crispy_field }}
+                             </td>
+
+                        </tr>

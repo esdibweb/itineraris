@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block main_content %}
+<div class="container-fluid">
+  <div class="row">
+      <!-- Sidebar -->
+    <sidebar id="sidebar" class="col-md-4 col-lg-3 d-md-block">
+        {% block sidebar %}
+        {% endblock %}
+    </sidebar>
+
+      <!-- Main area -->
+    <main class="col-md-8 col-lg-9 px-md-4 main-content">
+      <!-- Main content -->
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{% block title_content %}{% endblock %}</h1>
+    </div>
+        {% block content %}
+        {% endblock %}
+    </main>
+  </div>
+</div>
+
+{% endblock %}

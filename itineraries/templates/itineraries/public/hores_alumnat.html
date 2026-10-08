@@ -1,0 +1,42 @@
+{% extends 'layouts/no-sidebar.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}Recompte d'hores d'itinerari extracurricular{% endblock %}
+
+{% block header %}
+<img src="/static/images/logotip-esdib.png" alt="Logotip" width="100" height="100" class="d-inline-block align-text-top">
+{% endblock %}
+{% block content %}
+            <h3>Recompte d'hores d'itinerari extracurricular</h3>
+            {% if error_message %}
+                <p>{{ error_message }}</p>
+            {% else %}
+                <p>Alumne: {{ student }}</p>
+                <p>Total de hores: {{ total_hours }}</p>
+                <h4>Detall:</h4>
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>Data</th>
+                            <th>Activitat</th>
+                            <th>Hores</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for student_hour in student_hours %}
+                        <tr>
+                            <td>{{ student_hour.activity.date }}</td>
+                            <td>{{ student_hour.activity }}</td>
+                            <td>{{ student_hour.hours }}</td>
+                        </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No s'han trobat registres d'hores.</td>
+                    </tr>
+                {% endfor %}
+                  </tbody>
+                </table>
+            {% endif %}
+            <a class="btn btn-secondary" href="{% url 'logout' %}?next={{ request.path }}">Sortir</a>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'itineraries/llistat.html' %}
+
+{% block title %}Llistat d'activitats de representació{% endblock %}
+
+{% block title_content %}Llistat d'activitats de representació{% endblock %}
+
+{% block content %}
+    <table id="representacio" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Activitat</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <a class="btn btn-secondary btn-sm" href="{% url 'itineraries:nova_representacio' %}">Crear nou registre</a>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+
+    $(document).ready(function() {
+
+        idTable = 'representacio';
+        ajaxUrl = "{% url 'itineraries:representacio_data' %}";
+
+        // Define las URL editUrl y deleteUrl como plantillas aquí
+        const editUrlTemplate = "{% url 'itineraries:edit_representacio' pk=0 %}";
+        const deleteUrlTemplate = "{% url 'itineraries:delete_representacio' pk=0 %}";
+
+        // Variable para definir el ancho de los botones
+        const buttonWidth = "80px";  // Puedes cambiar el valor a porcentaje o píxeles según tu preferencia
+
+        $('#' + idTable).DataTable({
+            "ajax": ajaxUrl,
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ entrades per pàgina",
+                "zeroRecords": "No s'han trobat resultats",
+                "info": "Mostrant de _START_ a _END_ de _TOTAL_ entrades",
+                "infoEmpty": "Mostrant de 0 a 0 de 0 entrades",
+                "infoFiltered": "(filtrat de _MAX_ entrades en total)",
+                "search": "Cercar:",
+                "paginate": {
+                    "first": "Primer",
+                    "last": "Últim",
+                    "next": "Següent",
+                    "previous": "Anterior"
+                }
+            },
+            "stateSave": true,
+            "autoWidth": false, // Evita que les columnes es redimensionin automàticament
+            "columns": [
+                { "data": "title", "title": "Títol", "render": DataTable.render.text() },
+                { "data": "date", "title": "Data" },
+                {
+                    "data": null,
+                    "title": 'Opcions',
+                    "orderable": false,
+                    "className": "text-center",  // Centra el contingut de la columna
+                    "render": function (data, type, row) {
+
+                        const editUrl = editUrlTemplate.replace('0', row.id);
+                        const deleteUrl = deleteUrlTemplate.replace('0', row.id);
+
+                        return '<div class="d-flex justify-content-end gap-2">' +
+                            '<a href="' + editUrl + '" class="btn btn-sm btn-secondary" style="width:' + buttonWidth + '">Editar</a>' +
+                            '<form method="POST" action="' + deleteUrl + '" style="display:inline;" onsubmit="return confirm(\'Totes les hores associades seran esborrades. Estàs segur que vols eliminar aquest element?\');">' +
+                                '<input type="hidden" name="csrfmiddlewaretoken" value="' + getCSRFToken() + '">' +  // CSRF token function
+                                '<button type="submit" class="btn btn-sm btn-danger" style="width:' + buttonWidth + '">Esborrar</button>' +
+                            '</form>' +
+                            '</div>';
+                    }
+                }
+            ],
+            "columnDefs": [
+                { "width": "1%", "targets": -1 }
+            ]
+        });
+    });
+
+</script>
+{% endblock %}

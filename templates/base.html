@@ -1,0 +1,46 @@
+{% load static %}
+{% load django_bootstrap5 %}
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Intranet ESDIB{% endblock %}</title>
+
+    <!-- CSS -->
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="{% static 'js/main.js' %}"></script>
+
+    {% block extra_head %}
+    {% endblock %}
+</head>
+<body>
+    <div class="container mt-5">
+    {% block header %}
+        <!-- Navbar -->
+        {% include 'partials/navbar.html' %}
+    {% endblock %}
+    {% block bread_crumb %}
+    {% endblock %}
+    {% if show_messages != False %}
+        {% bootstrap_messages %}
+    {% endif %}
+
+    {% block main_content %}
+    {% endblock %}
+
+    {% block footer %}
+        <!-- Footer -->
+        <footer class="text-center mt-3 py-3 bg-light">
+            <p>&copy; {% now "Y" %} Escola Superior de Disseny.</p>
+        </footer>
+    {% endblock %}
+    </div>
+    <!-- JavaScript -->
+    {% bootstrap_javascript %}
+
+    {% block extra_scripts %}
+    {% endblock %}
+</body>
+</html>

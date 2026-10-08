@@ -1,0 +1,46 @@
+{% extends 'itineraries/index.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title_content %}{% if is_edit %}Edició registre de premis{% else %}Nova registre de premis{% endif %}{% endblock %}
+{% block content %}
+    <!-- Activity form -->
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        {{ form.title|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.date|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        {{ form.description|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                     <div class="form-group col-md-12">
+                        {{ form.organitzation|as_crispy_field }}
+                    </div>
+                </div>
+                <h4>Alumnat</h4>
+                {{ student_hours_formset.management_form }}
+                <table class="table table-bordered">
+                    <tbody>
+                        {% for form in student_hours_formset %}
+                            {{ form.id }}
+                            {% include "itineraries/forms/partials/student_hours_row.html" %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="submit" class="btn btn-success mt-3">
+                    {% if is_edit %}Actualizar{% else %}Desar{% endif %}
+                </button>
+                <a href="{% url 'itineraries:premis' %}" class="btn btn-secondary mt-3">Tornar</a>
+            </form>
+
+{% endblock %}
+{% block extra_scripts %}
+    {% include 'itineraries/forms/partials/select2.html' %}
+{% endblock %}

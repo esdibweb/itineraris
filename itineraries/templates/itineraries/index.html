@@ -1,0 +1,57 @@
+{% extends 'layouts/sidebar.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}Gestió itineraris{% endblock %}
+
+{% block extra_head %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="/static/tinymce/tinymce.min.js"></script>
+    <script src="/static/django_tinymce/init_tinymce.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+{% endblock %}
+{% block title_content %}Gestio itineraris{% endblock %}
+{% block sidebar %}
+<nav class="pt-3">
+  <div class="list-group">
+
+  {% if perms.itineraries.manage_student_hours %}
+      <a href="{% url 'itineraries:alumnat' %}" class="list-group-item list-group-item-action {% if opt == 'alumnat' %}active{% endif %}" aria-current="true">
+            Consulta alumnat
+      </a>
+  {% endif %}
+
+  {% if perms.itineraries.manage_act_int_colab %}
+      <a href="{% url 'itineraries:internes' %}" class="list-group-item list-group-item-action {% if opt == 'internes' %}active{% endif %}">
+          Col·laboració internes
+      </a>
+  {% endif %}
+
+  {% if perms.itineraries.manage_act_award %}
+      <a href="{% url 'itineraries:premis' %}" class="list-group-item list-group-item-action {% if opt == 'premis' %}active{% endif %}">
+          Premis
+      </a>
+  {% endif %}
+
+  {% if perms.itineraries.manage_act_int_repr %}
+      <a href="{% url 'itineraries:representacio' %}" class="list-group-item list-group-item-action {% if opt == 'representacio' %}active{% endif %}">
+          Representació
+      </a>
+  {% endif %}
+
+  {% if perms.itineraries.manage_act_external %}
+      <a href="{% url 'itineraries:externes' %}" class="list-group-item list-group-item-action {% if opt == 'externes' %}active{% endif %}">
+          Col·laboració externes
+      </a>
+  {% endif %}
+
+    </div>
+</nav>
+{% endblock %}
+{% block content %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}

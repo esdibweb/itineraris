@@ -1,0 +1,33 @@
+{% extends 'layouts/no-sidebar.html' %}
+{% load crispy_forms_tags %}
+{% load socialaccount %}
+{% load static %}
+
+{% block title %}Iniciar Sessió - Intranet ESDIB{% endblock %}
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+    <div class="card p-4 shadow" style="max-width: 400px; width: 100%;">
+        <h2 class="text-center mb-4">Iniciar Sessió</h2>
+        {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                Si us plau, corregeix els errors a continuació.
+            </div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-primary w-100 mt-3">Entrar</button>
+        </form>
+        <hr>
+        <form method="post" action="{% provider_login_url 'google' %}" class="mt-3 text-center">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger w-100">
+                <i class="bi bi-google me-2"></i> Iniciar amb compte Escola Disseny (Google)
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

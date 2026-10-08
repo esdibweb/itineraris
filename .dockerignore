@@ -1,0 +1,34 @@
+# Version control and CI
+.git
+.github
+.gitignore
+.gitattributes
+
+# Secrets and local configuration
+.env
+.env.*
+home/settings_local.py
+run_local.ps1
+
+# Data and personal information
+*.sqlite3
+*.dump
+*.sql
+*.csv
+db_backup/
+media/
+mediafiles/
+
+# Generated and local files
+venv/
+.venv/
+**/__pycache__/
+*.pyc
+staticfiles/
+node_modules/
+*.log
+
+# Deployment files not needed inside the image
+docker-compose.yml
+*.md
+SECURITY_AUDIT.md

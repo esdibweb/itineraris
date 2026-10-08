@@ -1,0 +1,29 @@
+{% extends 'layouts/sidebar.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}Importació Codex{% endblock %}
+
+{% block extra_head %}
+{% endblock %}
+{% block title_content %}Importació Codex{% endblock %}
+{% block sidebar %}
+<nav class="pt-3">
+  <div class="list-group">
+
+      <a href="{% url 'gcodex:alumnat' %}" class="list-group-item list-group-item-action {% if opt == 'alumnat' %}active{% endif %}" aria-current="true">
+            Importa alumnat
+      </a>
+
+      <a href="{% url 'gcodex:docents' %}" class="list-group-item list-group-item-action {% if opt == 'docents' %}active{% endif %}">
+          Importa docents
+      </a>
+
+    </div>
+</nav>
+{% endblock %}
+{% block content %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% endblock %}
