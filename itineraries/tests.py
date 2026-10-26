@@ -1,10 +1,12 @@
 import datetime
-from io import StringIO
+from io import BytesIO, StringIO
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from openpyxl import load_workbook
 
 from gcodex.models import Student
 from .forms import StudentHoursFormSet
@@ -112,3 +114,54 @@ class PageSmokeTests(TestCase):
         self.assertContains(self.client.get(reverse('home')), 'v2026.10.08-abc1234')
         self.client.logout()
         self.assertContains(self.client.get(reverse('login')), 'Versió 2026.10.08-abc1234')
+
+
+class ExportTests(TestCase):
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user('docent', password='x')
+        self.url = reverse('itineraries:export')
+
+        student = make_student('11111111A')
+        date = datetime.date(2026, 10, 1)
+        self.external = ActivityExternal.objects.create(title='=HYPERLINK("http://x")', date=date, organitzation='Org')
+        self.award = ActivityAward.objects.create(title='Premi', date=date, organitzation='Jurat')
+        StudentHours.objects.create(student=student, activity=self.external, hours=3)
+        StudentHours.objects.create(student=student, activity=self.award, hours=2)
+        Annotation.objects.create(student=student, date=date, observations='Pagat')
+
+    def download(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('attachment; filename="itineraris-', response['Content-Disposition'])
+        return load_workbook(BytesIO(response.content))
+
+    def test_requires_hours_permission(self):
+        self.client.force_login(self.user)
+        self.assertEqual(self.client.get(self.url).status_code, 403)
+
+    def test_workbook_contents(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='manage_student_hours'))
+        self.client.force_login(self.user)
+
+        workbook = self.download()
+
+        self.assertEqual(workbook.sheetnames, ['Alumnat', 'Hores', 'Activitats'])
+        students = list(workbook['Alumnat'].iter_rows(min_row=2, values_only=True))
+        self.assertEqual(students, [('11111111A', None, None, 5, datetime.datetime(2026, 10, 1), 'Pagat')])
+
+        hours = list(workbook['Hores'].iter_rows(min_row=2, values_only=True))
+        self.assertEqual(len(hours), 2)
+        self.assertIn(('Col·laboració externa', 'Org', 3), [(row[3], row[5], row[6]) for row in hours])
+
+        activities = {row[0]: row for row in workbook['Activitats'].iter_rows(min_row=2, values_only=True)}
+        self.assertEqual(activities['Premi'][1:], ('Premi', datetime.datetime(2026, 10, 1), 'Jurat', 1, 2))
+
+    def test_text_that_looks_like_a_formula_stays_text(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='manage_student_hours'))
+        self.client.force_login(self.user)
+
+        sheet = self.download()['Activitats']
+
+        cell = next(row[0] for row in sheet.iter_rows(min_row=2) if str(row[0].value).startswith('='))
+        self.assertEqual(cell.data_type, 's')

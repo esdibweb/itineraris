@@ -11,10 +11,12 @@ django-bootstrap5==26.3
 django-crispy-forms==2.7
 django-mailer==2.3.2
 django-tinymce==5.0.0
+et_xmlfile==2.0.0
 gunicorn==26.2.0
 idna==3.20
 lockfile==0.12.2
 oauthlib==4.0.0
+openpyxl==3.1.5
 pillow==12.3.0
 psycopg2-binary==2.9.13
 pycparser==3.0

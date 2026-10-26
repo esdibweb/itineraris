@@ -48,6 +48,15 @@
   {% endif %}
 
     </div>
+
+  {% if perms.itineraries.manage_student_hours %}
+  <h6 class="text-muted text-uppercase small mt-4 mb-2 px-1">Exportació</h6>
+  <div class="list-group">
+      <a href="{% url 'itineraries:export' %}" class="list-group-item list-group-item-action">
+          Exportar dades a Excel
+      </a>
+  </div>
+  {% endif %}
 </nav>
 {% endblock %}
 {% block content %}

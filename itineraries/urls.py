@@ -40,4 +40,6 @@ urlpatterns = [
     path('representacio-data', views.ActivityInternalRepresentListView.as_view(), name='representacio_data'),
     path('externes-data', views.ActivityExternalListView.as_view(), name='externes_data'),
     path('students-hours', views.StudentHoursListView.as_view(), name='students_hours_data'),
+
+    path('exportar', views.ExportView.as_view(), name='export'),
 ]

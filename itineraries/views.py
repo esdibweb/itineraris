@@ -1,14 +1,16 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Sum
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views import View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from mailer import send_mail
 
 from gcodex.models import Student
+from .exports import build_workbook
 from .forms import (
     ActivityAwardForm, ActivityExternalForm, ActivityInternalColaborateForm, ActivityInternalRepresentForm,
     AnnotationForm, StudentHoursFormSet,
@@ -372,3 +374,19 @@ class StudentHoursListView(PermissionRequiredMixin, View):
             for student in students
         ]
         return JsonResponse({'data': data})
+
+
+# Excel export
+
+class ExportView(PermissionRequiredMixin, View):
+    """Students, hours and activities as an Excel file."""
+    permission_required = 'itineraries.manage_student_hours'
+
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(
+            build_workbook(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        filename = f'itineraris-{timezone.localdate():%Y-%m-%d}.xlsx'
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response
