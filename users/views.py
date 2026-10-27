@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.http import FileResponse, Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView
@@ -29,6 +29,13 @@ class CustomLogoutView(LogoutView):
 
 class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'users/home.html'
+
+    def get(self, request, *args, **kwargs):
+        # Users without any permission are students: send them to their own hours
+        user = request.user
+        if not user.is_staff and not user.get_all_permissions():
+            return redirect('itineraries:public')
+        return super().get(request, *args, **kwargs)
 
 
 class AvatarView(LoginRequiredMixin, View):

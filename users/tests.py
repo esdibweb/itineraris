@@ -3,6 +3,7 @@ from unittest import mock
 from allauth.account.models import EmailAddress
 from allauth.socialaccount.models import SocialAccount, SocialLogin
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
@@ -96,6 +97,15 @@ class AccessTests(TestCase):
         response = self.client.post(url, {'username': 'docent', 'password': 'correct-password'})
         self.assertEqual(response.status_code, 429)
         self.assertNotIn('_auth_user_id', self.client.session)
+
+    def test_users_without_permissions_go_to_their_hours(self):
+        self.client.force_login(self.user)
+        self.assertRedirects(self.client.get(reverse('home')), reverse('itineraries:public'))
+
+    def test_users_with_a_permission_see_home(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='manage_student_hours'))
+        self.client.force_login(self.user)
+        self.assertEqual(self.client.get(reverse('home')).status_code, 200)
 
     def test_client_ip_uses_the_address_added_by_the_proxy(self):
         request = RequestFactory().get('/', HTTP_X_FORWARDED_FOR='1.2.3.4, 10.0.0.9', REMOTE_ADDR='10.0.0.1')
